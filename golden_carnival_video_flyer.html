@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Carnival Flyer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Added 'Great Vibes' for Cursive Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Lato:wght@300;400;700&family=Noto+Serif+JP:wght@400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        /* Typography */
+        .font-title { font-family: 'Cinzel', serif; }
+        .font-body { font-family: 'Lato', sans-serif; }
+        .font-cursive { font-family: 'Great Vibes', cursive; }
+        /* Japanese font fallback */
+        body.lang-ja .font-title, 
+        body.lang-ja .font-body { font-family: 'Cinzel', 'Noto Serif JP', serif; }
+        
+        /* Metallic Gold Gradient Text */
+        .text-gold-gradient {
+            background: linear-gradient(to bottom, #fffebb 0%, #d4af37 40%, #a67c00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+        }
+        
+        /* Solid Gold Text for highlights */
+        .text-gold {
+            color: #d4af37;
+        }
+
+        /* Container for 9:16 Aspect Ratio */
+        body {
+            background-color: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #flyer-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 56.25vh; /* 9:16 aspect ratio constraint */
+            max-height: 100vh;
+            background: #000;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Animation Classes */
+        .scene {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            z-index: 10; /* Text layer */
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Background Image Styling */
+        .scene-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: -2;
+            transition: opacity 1s ease-out;
+        }
+        
+        .active .scene-bg {
+            opacity: 1;
+        }
+
+        /* Gallery Image Styling */
+        .gallery-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: -2;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .gallery-img.visible {
+            opacity: 1;
+        }
+
+        /* Dark Overlay for Readability */
+        .scene-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+            background-color: rgba(0,0,0,0.5);
+            z-index: -1;
+            opacity: 1;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        /* Text Animation States */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        .active .fade-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* REVEAL EFFECT: Text Fades Out, Image Comes Upfront */
+        .scene.active.revealed .fade-up {
+            opacity: 0 !important;
+            transform: translateY(-20px) !important;
+            transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+        }
+
+        .scene.active.revealed .scene-overlay {
+            opacity: 0; /* Remove overlay to brighten image */
+            transition: opacity 0.5s ease-in; /* Sync with text fade */
+        }
+
+        .divider-gold {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d4af37, #fffebb, #d4af37, transparent);
+            width: 50%;
+            margin: 1.5rem auto;
+            opacity: 0.8;
+            box-shadow: 0 0 10px #d4af37;
+        }
+
+        /* Canvas Overlay (Gold Dust) */
+        #dust-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20; /* On top of images */
+            pointer-events: none;
+        }
+
+        /* Subtle vignette */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        /* Control Buttons */
+        .control-btn {
+            position: absolute;
+            top: 20px;
+            z-index: 60;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .control-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .control-btn:hover {
+            background: #d4af37;
+            color: black;
+        }
+
+        #mute-btn { right: 20px; }
+        #pause-btn { right: 70px; }
+        #rewind-btn { right: 120px; }
+        #lang-btn { 
+            left: 20px; 
+            top: 20px; 
+            width: auto; 
+            padding: 8px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-family: 'Lato', sans-serif;
+            font-weight: bold;
+            opacity: 1 !important; 
+            pointer-events: auto !important;
+        }
+
+        /* Hidden YouTube Player */
+        #youtube-player-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="flyer-container">
+        
+        <!-- Audio Element (For File Uploads) -->
+        <!-- 🎵 PASTE YOUR MUSIC LINK BELOW inside src="" -->
+        <audio id="bg-audio" loop src=""></audio>
+
+        <!-- YouTube Player Container (For Default Music) -->
+        <div id="youtube-player-container"><div id="youtube-player"></div></div>
+
+        <!-- Falling Dust Layer (Now on top of images) -->
+        <canvas id="dust-canvas"></canvas>
+        <div class="vignette"></div>
+
+        <!-- Control Buttons -->
+        <button id="lang-btn" class="control-btn visible" title="Switch Language">EN | JP</button>
+
+        <button id="rewind-btn" class="control-btn" title="Rewind 5s">
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 19 2 12 11 5 11 19"></polygon><polygon points="22 19 13 12 22 5 22 19"></polygon></svg>
+        </button>
+
+        <button id="pause-btn" class="control-btn" title="Pause/Resume">
+            <!-- Pause Icon -->
+            <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            <!-- Play Icon (Hidden by default) -->
+            <svg id="icon-play" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+
+        <button id="mute-btn" class="control-btn" title="Mute/Unmute">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+        </button>
+
+        <!-- Start Overlay -->
+        <div id="start-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-95 text-center px-4">
+            
+            <!-- CREATOR CONTROLS (Input Fields) -->
+            <!-- These are visible by default but HIDDEN if a shared link is opened -->
+            <div id="creator-controls" class="mb-6 flex flex-col gap-3 w-full max-w-xs transition-all duration-300">
+                <p id="lbl-personalize" class="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Personalize Invitation</p>
+                <input type="text" id="input-to" placeholder="To: Guest Name" 
+                       class="bg-transparent border border-gray-600 text-[#d4af37] placeholder-gray-500 px-4 py-2 text-center rounded focus:outline-none focus:border-[#d4af37] font-body text-sm uppercase tracking-wider">
+                <input type="text" id="input-from" placeholder="From: Your Name" 
+                       class="bg-transparent border border-gray-600 text-[#d4af37] placeholder-gray-500 px-4 py-2 text-center rounded focus:outline-none focus:border-[#d4af37] font-body text-sm uppercase tracking-wider">
+                
+                <!-- Version Selector -->
+                <select id="input-version" class="bg-transparent border border-gray-600 text-[#d4af37] px-4 py-2 text-center rounded focus:outline-none focus:border-[#d4af37] font-body text-sm uppercase tracking-wider">
+                    <option value="std" class="bg-black text-[#d4af37]">Version: Standard (Men)</option>
+                    <option value="women" class="bg-black text-[#d4af37]">Version: Women</option>
+                </select>
+
+                <!-- New Copy Link Button -->
+                <button id="copy-link-btn" class="bg-[#d4af37] text-black font-bold py-2 px-4 rounded text-xs uppercase tracking-widest hover:bg-[#fffebb] transition mt-2 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    <span id="text-copy-link">Copy Link to Send</span>
+                </button>
+                <p id="copy-feedback" class="text-green-400 text-xs mt-1 hidden">Link copied!</p>
+            </div>
+
+            <!-- Music Upload -->
+            <div id="music-upload-container" class="mb-8">
+                <input type="file" id="music-upload" accept="audio/*" class="hidden">
+                <label for="music-upload" class="cursor-pointer flex items-center gap-2 text-gray-400 hover:text-[#d4af37] transition duration-300 border border-gray-700 hover:border-[#d4af37] px-4 py-2 rounded-full text-xs uppercase tracking-widest">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    <span id="music-label">Add Music (Optional)</span>
+                </label>
+            </div>
+
+            <button id="play-btn" class="border border-[#d4af37] text-[#d4af37] px-8 py-3 font-title text-xl tracking-widest hover:bg-[#d4af37] hover:text-black transition duration-300 uppercase mb-4">
+                Play Me!
+            </button>
+
+        </div>
+
+        <!-- SCENE 0 (0-5s): Personal Invitation (NEW) -->
+        <div id="scene-0" class="scene">
+            <!-- Background Image Removed for Scene 0 -->
+            
+            <div class="fade-up text-center w-full px-2">
+                <p id="text-invite-for" class="font-body text-[#d4af37] text-xs uppercase tracking-widest mb-4">An Exclusive Invitation For</p>
+                <!-- Large Cursive Guest Name -->
+                <h2 id="display-to" class="font-cursive text-gold-gradient text-7xl md:text-8xl leading-tight mb-8 drop-shadow-lg break-words">
+                    Distinguished Guest
+                </h2>
+                
+                <div class="w-16 h-[1px] bg-[#d4af37] mx-auto mb-8 opacity-60"></div>
+                
+                <p id="text-from" class="font-body text-[#d4af37] text-[10px] uppercase tracking-widest mb-2">From</p>
+                <!-- Large Cursive Host Name -->
+                <p id="display-from" class="font-cursive text-white text-5xl md:text-6xl tracking-wide drop-shadow-md">
+                    R.E.G.
+                </p>
+            </div>
+        </div>
+
+        <!-- SCENE 1 (5-12s): Title (Shifted +5s) -->
+        <div id="scene-1" class="scene">
+            <img src="https://i.postimg.cc/8c620SyK/1-Golden-Carnival-REG-Feb-Compressed.jpg" class="scene-bg" alt="Title Background">
+            <div class="scene-overlay"></div>
+            
+            <p id="text-presents" class="font-body text-[#fffebb] text-[10px] md:text-xs uppercase tracking-[0.25em] mb-6 fade-up opacity-90" style="transition-delay: 0.2s;">
+                R.E.G. Presents
+            </p>
+
+            <h1 id="text-title" class="font-title text-5xl md:text-6xl text-gold-gradient text-center leading-tight tracking-normal fade-up" style="transition-delay: 0.6s;">
+                GOLDEN<br>CARNIVAL
+            </h1>
+            
+            <div class="divider-gold fade-up" style="transition-delay: 1.0s;"></div>
+
+            <p id="text-rsvp" class="font-title text-gold-gradient text-lg tracking-wide fade-up" style="transition-delay: 1.2s;">
+                STRICTLY RSVP ONLY 
+            </p>
+        </div>
+
+        <!-- SCENE 2 (12-18s): Date (Shifted +5s) -->
+        <div id="scene-2" class="scene">
+            <img id="scene-2-bg" src="https://i.postimg.cc/CMnCQ1Ng/2-Payment-Options-REG-Feb-compressed.png" class="scene-bg" alt="Party Background">
+            <div class="scene-overlay"></div>
+
+            <div class="fade-up text-center" style="transition-delay: 0.1s;">
+                <p id="text-save-date" class="font-body text-[#d4af37] text-xs uppercase tracking-widest mb-4">Save the Date</p>
+                <h2 id="text-day" class="font-title text-4xl text-white mb-2">Saturday</h2>
+                <h2 id="text-date" class="font-title text-5xl text-gold-gradient mb-1">Feb 28th</h2>
+                <p id="text-year" class="font-title text-white text-xl mt-2">2026</p>
+            </div>
+            <div class="my-4 fade-up text-center" style="transition-delay: 0.2s;">
+                <p class="font-body text-4xl text-white font-light tracking-[0.1em] border-b border-[#d4af37] pb-2">18:00–23:00</p>
+            </div>
+        </div>
+
+        <!-- SCENE 3 (18-25s): Time & Venue (Shifted +5s) -->
+        <div id="scene-3" class="scene">
+            <img src="https://i.postimg.cc/3wyWxyWm/3_Venue_REG_Feb_compressed.png" class="scene-bg" alt="Hotel Background">
+            <div class="scene-overlay"></div>
+
+            <div class="fade-up text-center px-6 mt-8" style="transition-delay: 0.6s;">
+                <p id="text-venue-label" class="font-body text-[#d4af37] text-xs uppercase tracking-widest mb-2 font-bold">Venue</p>
+                <p id="text-venue" class="font-title text-white text-2xl leading-relaxed">
+                    Luxury Suite Room<br>Central Tokyo Hotel
+                </p>
+            </div>
+        </div>
+
+        <!-- SCENE 4 (25-33s): Experience Text 1 (Shifted +5s) -->
+        <div id="scene-4" class="scene">
+            <img src="https://i.postimg.cc/mr0kzbF7/4_Bar_text_REG_Feb_compressed.png" class="scene-bg" alt="Champagne Background">
+            <div class="scene-overlay"></div>
+
+            <div class="fade-up px-8 text-center" style="transition-delay: 0.2s;">
+                <p class="font-title text-white text-lg md:text-xl leading-relaxed tracking-wide">
+                    <span id="text-exp-1">An evening of</span><br>
+                    <span id="text-exp-2" class="text-gold-gradient text-2xl font-bold">Elevated Celebration</span>
+                </p>
+                <p id="text-exp-3" class="font-body text-gray-300 text-sm mt-4">and unforgettable energy.</p>
+            </div>
+        </div>
+
+        <!-- SCENE 5 (33-36s): Experience Text 2 (Shifted +5s) -->
+        <div id="scene-5" class="scene">
+            <img src="https://i.postimg.cc/7LphGxT0/5_Bar_and_Food_REG_Feb_compressed.png" class="scene-bg" alt="Elegant People">
+            <div class="scene-overlay"></div>
+        </div>
+
+        <!-- SCENE 6 (36-44s): Dress Code (Shifted +5s) -->
+        <div id="scene-6" class="scene">
+            <img src="https://i.postimg.cc/MZV4J82V/Dress-Code-REG-Feb-No-text.png" class="scene-bg" alt="Dress Code Background">
+            <div class="scene-overlay"></div>
+
+            <div class="w-full text-center fade-up" style="transition-delay: 0.2s;">
+                <p id="text-dc-label" class="font-title text-[#d4af37] text-2xl mb-4 border-b border-white/20 inline-block pb-2">Dress Code</p>
+                <p id="text-dc-main" class="font-title text-white text-3xl mb-4">ELEGANT</p>
+                <div class="bg-black/40 p-4 rounded backdrop-blur-sm mx-4">
+                    <p id="text-dc-gents" class="font-body text-gray-200 text-sm">Gents: Suit</p>
+                    <p id="text-dc-ladies" class="font-body text-gray-200 text-sm">Ladies: Red /  Black / White / Gold</p>
+                    <p id="text-dc-note" class="font-body text-[#fffebb] text-1x1 italic mt-2">Golden accessories encouraged ✨</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SCENE 7 (44-52s): GALLERY MONTAGE (Shifted +5s) -->
+        <div id="scene-gallery" class="scene">
+            <!-- 20 Images for Rapid Fire Montage -->
+            <div id="gallery-container">
+                <img src="https://i.postimg.cc/3rBsRYVK/REG_Feb_Pic_6.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 1">
+                <img src="https://i.postimg.cc/L68rgGFf/REG_Feb_Pic_2.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 2">
+                <img src="https://i.postimg.cc/yxvtrycZ/REG_Feb_Pic_5.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 3">
+                <img src="https://i.postimg.cc/x1cxwZz3/REG_Feb_Pic_10.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 4">
+                <img src="https://i.postimg.cc/W1hWBykq/REG_Feb_Pic_8.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 5">
+                <img src="https://i.postimg.cc/RFcbPnnR/REG_Feb_Pic_7.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 6">
+                <img src="https://i.postimg.cc/cLr9pznv/REG_Feb_Pic_9.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 7">
+                <img src="https://i.postimg.cc/qMv96WHx/REG_Feb_Pic_4.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 8">
+                <img src="https://i.postimg.cc/Qx6YnDHK/REG_Feb_Pic3.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 9">
+                <img src="https://i.postimg.cc/x1tSmVt5/REG_Feb_Pic_13.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 10">
+                <img src="https://i.postimg.cc/QCGLD8d0/REG_Feb_Pic_20.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 11">
+                <img src="https://i.postimg.cc/yNG4fXqy/REG_Feb_Pic_17.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 12">
+                <img src="https://i.postimg.cc/TPsMkq8b/REG_Feb_Pic_16.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 13">
+                <img src="https://i.postimg.cc/TYjxRDmW/REG_Feb_Pic_15.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 14">
+                <img src="https://i.postimg.cc/Hkpgjk4V/REG_Feb_Pic_12.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 15">
+                <img src="https://i.postimg.cc/KzgXCkxF/REG_Feb_Pic_18.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 16">
+                <img src="https://i.postimg.cc/fT7sw9dG/REG_Feb_Pic_11.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 17">
+                <img src="https://i.postimg.cc/8CcgBXYc/REG_Feb_Pic_14.jpg?.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 18">
+                <img src="https://i.postimg.cc/Gtw0RLmt/REG_Feb_Pic_19.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 19">
+                <img src="https://i.postimg.cc/85r8xJNP/REG_Feb_Pic_21.jpg?auto=format&fit=crop&w=600&q=80" class="gallery-img" alt="Gallery 20">
+            </div>
+            
+            <div class="scene-overlay"></div>
+            
+            <div class="fade-up text-center relative z-20">
+                 <h2 id="text-past-events" class="font-title text-4xl text-gold-gradient tracking-[0.3em] drop-shadow-xl">PAST EVENTS</h2>
+                 <p id="text-memories" class="font-body text-[#fffebb] text-xs uppercase tracking-widest mt-2">Unforgettable Moments</p>
+            </div>
+        </div>
+
+        <!-- SCENE 8 (52-60.5s): Price & Action (Shifted +5s) -->
+        <div id="scene-8" class="scene justify-end pb-12">
+            <img src="https://i.postimg.cc/8c620SyK/1-Golden-Carnival-REG-Feb-Compressed.jpg" class="scene-bg" alt="Finale Background">
+            <div class="scene-overlay"></div>
+
+            <!-- Added ID 'price-container' to hide this block for women's version -->
+            <div id="price-container" class="fade-up text-center mb-12" style="transition-delay: 0.2s;">
+                 <p id="text-fee-label" class="font-body text-[#d4af37] text-sm uppercase mb-2">Event fee</p>
+                 <h2 class="font-title text-6xl text-gold-gradient tracking-tighter drop-shadow-lg">¥25,000</h2>
+            </div>
+
+            <div class="w-full flex items-end justify-between fade-up px-6" style="transition-delay: 0.5s;">
+                <div class="text-left flex-1">
+                    <p id="text-scan" class="font-body text-white text-sm font-bold uppercase mb-1 tracking-wider">Scan to Pay</p>
+                    
+                    <div class="text-[10px] text-gray-300 leading-tight border-l-2 border-[#d4af37] pl-2 mt-2">
+                        <p id="text-payment" class="text-[#d4af37] mb-0.5 font-bold">Payment via PayPay or Bank Transfer</p>
+                        <p id="text-other">Other options? Message us.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-1 rounded-sm ml-2 shrink-0 shadow-lg shadow-gold/20">
+                    <!-- The QR code image is generated automatically or set by logic -->
+                    <img id="qr-code-img" src="https://i.postimg.cc/15jVPbZc/IMG-7622.jpg" 
+                         alt="RSVP QR" 
+                         class="w-24 h-24">
+                </div>
+            </div>
+
+            <!-- New Cancellation Footnote -->
+            <p id="text-cancel" class="text-[8px] text-gray-500 mt-4 px-6 text-center leading-tight opacity-70">
+                Change of Plans? We get it, things come up. If you need to cancel 3 days or more before the event - you'll get a full refund. Less than 3 days, and we might not be able to refund, but let's chat if that happens.
+            </p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-bar" class="fixed bottom-0 left-0 h-1 bg-gradient-to-r from-[#d4af37] to-[#fffebb] z-50 transition-all duration-100 ease-linear" style="width: 0%;"></div>
+    </div>
+
+    <script>
+        // YOUTUBE PLAYER SETUP
+        let player;
+        let youtubeVideoID = '-d72XNa4yIM'; // Fixed Video ID
+        let usingFileAudio = false;
+        let isPlayerReady = false;
+
+        function onPlayerReady(event) {
+            isPlayerReady = true;
+        }
+
+        // Must be on window to be called by YouTube API
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('youtube-player', {
+                height: '1',
+                width: '1',
+                videoId: youtubeVideoID,
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': youtubeVideoID, // Required for loop
+                    'origin': window.location.origin
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        };
+
+        // Inject YouTube API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        /**
+         * FALLING GOLD DUST ENGINE
+         */
+        const canvas = document.getElementById('dust-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const colors = [
+            'rgba(255, 254, 187, 0.9)', 
+            'rgba(212, 175, 55, 0.8)',  
+            'rgba(197, 160, 0, 0.6)',   
+            'rgba(166, 124, 0, 0.4)'    
+        ];
+
+        let particles = [];
+        let width, height;
+
+        function resize() {
+            width = canvas.parentElement.offsetWidth;
+            height = canvas.parentElement.offsetHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.x = Math.random() * width;
+                if (initial) {
+                    this.y = Math.random() * height;
+                } else {
+                    this.y = -10; 
+                }
+                this.size = Math.random() < 0.9 ? Math.random() * 2 + 0.5 : Math.random() * 4 + 2; 
+                this.speed = Math.random() * 1.5 + 0.2; 
+                this.drift = (Math.random() - 0.5) * 0.3;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.opacity = Math.random() * 0.5 + 0.5;
+            }
+
+            update() {
+                this.y += this.speed;
+                this.x += this.drift;
+                this.x += Math.sin(this.y * 0.02) * 0.2;
+                if (this.y > height + 10) this.reset();
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function initParticles() {
+            resize();
+            particles = [];
+            for(let i = 0; i < 250; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateDust() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateDust);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles();
+        });
+
+        initParticles();
+        animateDust();
+
+
+        /**
+         * TIMELINE LOGIC (60.5 SECONDS)
+         * Scene 0: 5s (0-5000) - NEW Personal Invite
+         * Scene 1: 7s (5000-12000)
+         * Scene 2: 6s (12000-18000)
+         * Scene 3: 7s (18000-25000)
+         * Scene 4: 8s (25000-33000)
+         * Scene 5: 3s (33000-36000)
+         * Scene 6: 8s (36000-44000)
+         * Scene 7 (Gallery): 8s (44000-52000)
+         * Scene 8: 8.5s (52000-60500)
+         */
+        const scenes = [
+            { id: 'scene-0', start: 0, end: 5000 },
+            { id: 'scene-1', start: 5000, end: 12000 },
+            { id: 'scene-2', start: 12000, end: 18000 },
+            { id: 'scene-3', start: 18000, end: 25000 },
+            { id: 'scene-4', start: 25000, end: 33000 },
+            { id: 'scene-5', start: 33000, end: 36000 },
+            { id: 'scene-6', start: 36000, end: 44000 },
+            { id: 'scene-gallery', start: 44000, end: 52000 },
+            { id: 'scene-8', start: 52000, end: 60500 }
+        ];
+
+        let startTime = null;
+        let animationFrameId = null;
+        let isPaused = false;
+        let pauseStart = 0;
+        let totalPausedTime = 0;
+
+        const progressBar = document.getElementById('progress-bar');
+        const playBtn = document.getElementById('play-btn');
+        const overlay = document.getElementById('start-overlay');
+        const muteBtn = document.getElementById('mute-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const rewindBtn = document.getElementById('rewind-btn');
+        const langBtn = document.getElementById('lang-btn');
+        const iconPause = document.getElementById('icon-pause');
+        const iconPlay = document.getElementById('icon-play');
+        const audio = document.getElementById('bg-audio');
+        const musicUpload = document.getElementById('music-upload');
+        const musicLabel = document.getElementById('music-label');
+        
+        // Personalization Inputs
+        const inputTo = document.getElementById('input-to');
+        const inputFrom = document.getElementById('input-from');
+        const inputVersion = document.getElementById('input-version');
+        const displayTo = document.getElementById('display-to');
+        const displayFrom = document.getElementById('display-from');
+        
+        const totalDuration = 60500;
+        
+        // LANGUAGE SETTINGS
+        const translations = {
+            en: {
+                invite_for: "An Exclusive Invitation For",
+                from: "From",
+                presents: "R.E.G. Presents",
+                title: "GOLDEN<br>CARNIVAL",
+                rsvp_only: "STRICTLY RSVP ONLY",
+                save_date: "Save the Date",
+                day: "Saturday",
+                date: "Feb 28th",
+                year: "2026",
+                venue_label: "Venue",
+                venue: "Luxury Suite Room<br>Central Tokyo Hotel",
+                exp_1: "An evening of",
+                exp_2: "Elevated Celebration",
+                exp_3: "and unforgettable energy.",
+                dc_label: "Dress Code",
+                dc_main: "ELEGANT",
+                dc_gents: "Gents: Suit",
+                dc_ladies: "Ladies: Red / Black / White / Gold",
+                dc_note: "Golden accessories encouraged ✨",
+                past_events: "PAST EVENTS",
+                memories: "Unforgettable Moments",
+                fee_label: "Event fee",
+                scan: "Scan to Pay",
+                payment: "Payment via PayPay or Bank Transfer",
+                other: "Other options? Message us.",
+                lbl_personalize: "Personalize Invitation",
+                lbl_music: "Add Music (Optional)",
+                btn_play: "Play Me!",
+                btn_copy: "Copy Link to Send",
+                copy_fb: "Link copied!",
+                ph_to: "To: Guest Name",
+                ph_from: "From: Your Name",
+                cancel_policy: "Change of Plans? We get it, things come up. If you need to cancel 3 days or more before the event - you'll get a full refund. Less than 3 days, and we might not be able to refund, but let's chat if that happens."
+            },
+            ja: {
+                invite_for: "特別なご招待",
+                from: "送り主",
+                presents: "R.E.G. Presents",
+                title: "ゴールデン<br>カーニバル",
+                rsvp_only: "完全招待制",
+                save_date: "開催日",
+                day: "土曜日",
+                date: "2月28日",
+                year: "2026年",
+                venue_label: "会場",
+                venue: "都心ホテル<br>ラグジュアリー<br>スイート",
+                exp_1: "一夜限りの",
+                exp_2: "極上の<br>セレブレーション",
+                exp_3: "忘れられない熱狂を。",
+                dc_label: "ドレスコード",
+                dc_main: "エレガント",
+                dc_gents: "男性：スーツ",
+                dc_ladies: "女性：赤 / 黒 / 白  <br>ゴールデン",
+                dc_note: "ゴールデンアクセサリー<br>推奨 ✨",
+                past_events: "過去の<br>イベント",
+                memories: "思い出の瞬間",
+                fee_label: "参加費",
+                scan: "お支払い方法",
+                payment: "PayPayまたは<br>銀行振込",
+                other: "その他のオプションはメッセージまで",
+                lbl_personalize: "招待状をパーソナライズ",
+                lbl_music: "音楽を追加 (任意)",
+                btn_play: "再生する",
+                btn_copy: "リンクをコピー",
+                copy_fb: "リンクをコピーしました！",
+                ph_to: "宛先: ゲスト名",
+                ph_from: "差出人: あなたの名前",
+                cancel_policy: "急な予定変更があることは理解しています。イベントの3日前までのキャンセルであれば、全額返金いたします。3日を切っている場合は返金が難しい場合がありますが、その際はご相談ください。"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function updateLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            // Toggle body class for font adjustments
+            if(lang === 'ja') document.body.classList.add('lang-ja');
+            else document.body.classList.remove('lang-ja');
+
+            // Helper to set text by ID
+            const setTxt = (id, txt) => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = txt;
+            };
+            const setPh = (id, txt) => {
+                const el = document.getElementById(id);
+                if(el) el.placeholder = txt;
+            };
+
+            setTxt('text-invite-for', t.invite_for);
+            setTxt('text-from', t.from);
+            setTxt('text-presents', t.presents);
+            setTxt('text-title', t.title);
+            setTxt('text-rsvp', t.rsvp_only);
+            setTxt('text-save-date', t.save_date);
+            setTxt('text-day', t.day);
+            setTxt('text-date', t.date);
+            setTxt('text-year', t.year);
+            setTxt('text-venue-label', t.venue_label);
+            setTxt('text-venue', t.venue);
+            setTxt('text-exp-1', t.exp_1);
+            setTxt('text-exp-2', t.exp_2);
+            setTxt('text-exp-3', t.exp_3);
+            setTxt('text-dc-label', t.dc_label);
+            setTxt('text-dc-main', t.dc_main);
+            setTxt('text-dc-gents', t.dc_gents);
+            setTxt('text-dc-ladies', t.dc_ladies);
+            setTxt('text-dc-note', t.dc_note);
+            setTxt('text-past-events', t.past_events);
+            setTxt('text-memories', t.memories);
+            setTxt('text-fee-label', t.fee_label);
+            setTxt('text-scan', t.scan);
+            setTxt('text-payment', t.payment);
+            setTxt('text-other', t.other);
+            setTxt('lbl-personalize', t.lbl_personalize);
+            setTxt('music-label', t.lbl_music);
+            setTxt('play-btn', t.btn_play);
+            // Only set copy button text specifically, keeping icon
+            const copyBtnText = document.getElementById('text-copy-link');
+            if(copyBtnText) copyBtnText.innerText = t.btn_copy;
+            
+            setTxt('copy-feedback', t.copy_fb);
+            setTxt('text-cancel', t.cancel_policy);
+            setPh('input-to', t.ph_to);
+            setPh('input-from', t.ph_from);
+        }
+
+        // Initialize Language based on Browser
+        function initLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang.startsWith('ja')) {
+                updateLanguage('ja');
+            } else {
+                updateLanguage('en');
+            }
+        }
+
+        // Language Toggle Button
+        langBtn.addEventListener('click', () => {
+            if (currentLang === 'en') updateLanguage('ja');
+            else updateLanguage('en');
+        });
+
+        // Music Upload Handler (Overrides YouTube)
+        musicUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const objectUrl = URL.createObjectURL(file);
+                audio.src = objectUrl;
+                musicLabel.textContent = "File Selected: " + file.name.substring(0, 10) + "...";
+                musicLabel.style.color = "#d4af37";
+                musicLabel.style.borderColor = "#d4af37";
+                usingFileAudio = true;
+                
+                // Stop YouTube if it was loaded
+                if (player && player.stopVideo) player.stopVideo();
+            }
+        });
+
+        // Mute Toggle
+        muteBtn.addEventListener('click', function() {
+            if (usingFileAudio) {
+                audio.muted = !audio.muted;
+            } else if (player && player.isMuted) {
+                if (player.isMuted()) player.unMute();
+                else player.mute();
+            }
+
+            // UI Toggle
+            let isMuted = usingFileAudio ? audio.muted : (player ? player.isMuted() : false);
+            
+            if (isMuted) {
+                muteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v6a3 3 0 0 0 5.12 2.12M15 9.34V4"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path></svg>'; // Muted icon
+            } else {
+                muteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>'; // Sound icon
+            }
+        });
+
+        // Pause/Resume Toggle
+        pauseBtn.addEventListener('click', function() {
+            if (isPaused) {
+                // RESUME
+                isPaused = false;
+                const now = Date.now();
+                totalPausedTime += (now - pauseStart);
+                
+                if (usingFileAudio) {
+                     if (audio.src && audio.paused && !audio.ended) audio.play();
+                } else if (player && player.playVideo) {
+                    player.playVideo();
+                }
+                
+                iconPause.classList.remove('hidden');
+                iconPlay.classList.add('hidden');
+                runLoop();
+            } else {
+                // PAUSE
+                isPaused = true;
+                pauseStart = Date.now();
+                
+                if (usingFileAudio) {
+                    if (audio.src && !audio.paused) audio.pause();
+                } else if (player && player.pauseVideo) {
+                    player.pauseVideo();
+                }
+                
+                iconPause.classList.add('hidden');
+                iconPlay.classList.remove('hidden');
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            }
+        });
+
+        // Rewind Button Logic
+        rewindBtn.addEventListener('click', function() {
+            // Add 5000ms to startTime (which effectively reduces elapsed time)
+            startTime += 5000;
+            
+            // Re-calculate bounds to prevent rewinding before 0
+            const now = Date.now();
+            let elapsed = now - startTime - totalPausedTime;
+            if (isPaused) {
+                elapsed = pauseStart - startTime - totalPausedTime;
+            }
+
+            if (elapsed < 0) {
+                startTime = now - totalPausedTime; // Reset to 0
+                if (isPaused) startTime = pauseStart - totalPausedTime;
+                elapsed = 0;
+            }
+
+            // Sync Audio
+            if (usingFileAudio && audio.src) {
+                let newTime = audio.currentTime - 5;
+                if (newTime < 0) newTime = 0;
+                audio.currentTime = newTime;
+            } else if (player && player.getCurrentTime) {
+                let curr = player.getCurrentTime();
+                player.seekTo(Math.max(0, curr - 5));
+            }
+            
+            // If paused, we need to force a single frame render to show the change
+            if (isPaused) {
+                renderScene(Math.max(0, elapsed));
+            }
+        });
+
+        // Check URL Params for Personalization (Guest Mode)
+        document.addEventListener('DOMContentLoaded', () => {
+            initLanguage(); // Set initial language based on browser
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramTo = urlParams.get('to');
+            const paramFrom = urlParams.get('from');
+            const paramVersion = urlParams.get('v'); // v=women
+
+            if (paramTo || paramFrom || paramVersion) {
+                // GUEST MODE: Hide inputs, show names from URL
+                document.getElementById('creator-controls').style.display = 'none';
+                document.getElementById('music-upload-container').style.display = 'none';
+                
+                if (paramTo) {
+                    displayTo.textContent = decodeURIComponent(paramTo);
+                    // Also update input in case logic reads from it
+                    inputTo.value = decodeURIComponent(paramTo);
+                }
+                if (paramFrom) {
+                    displayFrom.textContent = decodeURIComponent(paramFrom);
+                    inputFrom.value = decodeURIComponent(paramFrom);
+                }
+
+                // Check for Women Version in URL
+                if (paramVersion === 'women') {
+                    applyWomenVersion();
+                }
+
+            } else {
+                // CREATOR MODE: Enable Copy Link Button
+                document.getElementById('copy-link-btn').addEventListener('click', () => {
+                    const baseUrl = window.location.href.split('?')[0];
+                    const toVal = encodeURIComponent(inputTo.value);
+                    const fromVal = encodeURIComponent(inputFrom.value);
+                    const verVal = inputVersion.value; // Get dropdown value
+                    
+                    // Only add params if values exist or women mode is selected
+                    let shareUrl = baseUrl;
+                    let params = [];
+                    if (inputTo.value) params.push(`to=${toVal}`);
+                    if (inputFrom.value) params.push(`from=${fromVal}`);
+                    if (verVal === 'women') params.push('v=women');
+
+                    if (params.length > 0) {
+                        shareUrl += '?' + params.join('&');
+                    }
+                    
+                    // FIX: Use execCommand for iframe compatibility
+                    const textArea = document.createElement("textarea");
+                    textArea.value = shareUrl;
+                    
+                    // Ensure it's not visible but part of DOM
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    textArea.style.top = "0";
+                    document.body.appendChild(textArea);
+                    
+                    textArea.focus();
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        const feedback = document.getElementById('copy-feedback');
+                        feedback.classList.remove('hidden');
+                        setTimeout(() => feedback.classList.add('hidden'), 3000);
+                    } catch (err) {
+                        console.error('Fallback: Oops, unable to copy', err);
+                        alert("Could not copy link automatically. Please copy the URL from the browser address bar.");
+                    }
+                    
+                    document.body.removeChild(textArea);
+                });
+            }
+        });
+
+        function applyWomenVersion() {
+            // 1. Hide Scene 2 Image
+            const s2bg = document.getElementById('scene-2-bg');
+            if(s2bg) s2bg.style.display = 'none';
+
+            // 2. Change QR Code (Women's Line Open Chat)
+            const qr = document.getElementById('qr-code-img');
+            if(qr) qr.src = 'https://i.postimg.cc/pdQcM0HS/Qr-Code.jpg';
+
+            // 3. Hide Price Container (Event Fee & ¥25,000)
+            const priceContainer = document.getElementById('price-container');
+            if(priceContainer) priceContainer.style.display = 'none';
+
+            // 4. Update Text Translations for Scene 8 keys
+            // Override EN
+            translations.en.scan = "RSVP by Joining the Line open Chat";
+            translations.en.payment = ""; // Hide payment text
+            translations.en.other = "";
+            
+            // Override JA
+            translations.ja.scan = "RSVPはLINEオープンチャット参加にてお願いします"; 
+            translations.ja.payment = "";
+            translations.ja.other = "";
+
+            // Re-apply language to update UI immediately
+            updateLanguage(currentLang);
+        }
+
+        function applyStandardVersion() {
+            // 1. Show Scene 2 Image
+            const s2bg = document.getElementById('scene-2-bg');
+            if(s2bg) s2bg.style.display = 'block';
+
+            // 2. Restore Standard QR Code (Payment)
+            const qr = document.getElementById('qr-code-img');
+            if(qr) qr.src = 'https://i.postimg.cc/15jVPbZc/IMG-7622.jpg';
+
+            // 3. Show Price Container
+            const priceContainer = document.getElementById('price-container');
+            if(priceContainer) priceContainer.style.display = 'block';
+
+            // 4. Restore Standard Text Translations
+            // Restore EN
+            translations.en.scan = "Scan to Pay";
+            translations.en.payment = "Payment via PayPay or Bank Transfer";
+            translations.en.other = "Other options? Message us.";
+            
+            // Restore JA
+            translations.ja.scan = "お支払い方法";
+            translations.ja.payment = "PayPayまたは<br>銀行振込";
+            translations.ja.other = "その他のオプションはメッセージまで";
+
+            // Re-apply language
+            updateLanguage(currentLang);
+        }
+
+        function startSequence() {
+            // APPLY PERSONALIZATION (If in Creator Mode)
+            // If in Guest Mode, values are already set by DOMContentLoaded
+            if(inputTo.value.trim() !== "") displayTo.textContent = inputTo.value;
+            if(inputFrom.value.trim() !== "") displayFrom.textContent = inputFrom.value;
+            
+            // Apply Version based on dropdown (Creator Mode) or existing state
+            // If the URL parameter 'v=women' was present, applyWomenVersion was already called in DOMContentLoaded.
+            // If we are in creator mode, we respect the dropdown.
+            const creatorControls = document.getElementById('creator-controls');
+            if (creatorControls.style.display !== 'none') {
+                if (inputVersion.value === 'women') {
+                    applyWomenVersion();
+                } else {
+                    applyStandardVersion();
+                }
+            }
+
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+            
+            // Reset state
+            totalPausedTime = 0;
+            isPaused = false;
+            iconPause.classList.remove('hidden');
+            iconPlay.classList.add('hidden');
+
+            // Play Audio (YouTube or File)
+            if (usingFileAudio && audio.src) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            } else if (player && isPlayerReady && player.playVideo) {
+                player.seekTo(0);
+                player.playVideo();
+            }
+            
+            // Show controls
+            muteBtn.classList.add('visible');
+            pauseBtn.classList.add('visible');
+            rewindBtn.classList.add('visible');
+            langBtn.classList.add('visible');
+            
+            startTime = Date.now();
+            runLoop();
+        }
+
+        function runLoop() {
+            const now = Date.now();
+            const elapsed = now - startTime - totalPausedTime;
+            
+            renderScene(elapsed);
+
+            if (elapsed < totalDuration && !isPaused) {
+                animationFrameId = requestAnimationFrame(runLoop);
+            } else if (elapsed >= totalDuration) {
+                // End
+                setTimeout(() => {
+                    overlay.style.display = 'flex';
+                    setTimeout(() => overlay.style.opacity = '1', 50);
+                    playBtn.innerText = "Replay";
+                    
+                    // Stop Audio
+                    if (usingFileAudio) audio.pause();
+                    else if (player && player.pauseVideo) player.pauseVideo();
+                    
+                    // Hide Controls
+                    muteBtn.classList.remove('visible');
+                    pauseBtn.classList.remove('visible');
+                    rewindBtn.classList.remove('visible');
+                    langBtn.classList.remove('visible');
+
+                    // Reset all
+                    document.querySelectorAll('.scene').forEach(s => {
+                        s.classList.remove('active');
+                        s.classList.remove('revealed');
+                    });
+                    document.querySelectorAll('.gallery-img').forEach(img => img.classList.remove('visible'));
+                    
+                    progressBar.style.width = '0%';
+                }, 1000);
+            }
+        }
+
+        function renderScene(elapsed) {
+            // Progress Bar
+            const pct = Math.min((elapsed / totalDuration) * 100, 100);
+            progressBar.style.width = `${pct}%`;
+
+            // Scene Switching & Reveal Logic
+            scenes.forEach(scene => {
+                const el = document.getElementById(scene.id);
+                if (elapsed >= scene.start && elapsed < scene.end) {
+                    if (!el.classList.contains('active')) {
+                        // Reset other scenes
+                        document.querySelectorAll('.scene').forEach(s => {
+                            if (s.id !== scene.id) {
+                                s.classList.remove('active');
+                                s.classList.remove('revealed');
+                            }
+                        });
+                        el.classList.add('active');
+                    }
+
+                    // Reveal Logic (Text fade & Image Brighten)
+                    // Exclude Scene 8 (Final RSVP)
+                    if (scene.id !== 'scene-8') {
+                        let threshold = 2500; // Default: 2.5 seconds
+                        
+                        // Special timing for Scene 7 (Gallery) and Scene 5 (Short): 1 second
+                        // This ensures the reveal happens quickly for short scenes
+                        if (scene.id === 'scene-gallery' || scene.id === 'scene-5') {
+                            threshold = 1000;
+                        }
+
+                        if ((elapsed - scene.start) > threshold) {
+                            el.classList.add('revealed');
+                        } else {
+                            el.classList.remove('revealed');
+                        }
+                    }
+
+                    // Special Logic for Gallery Scene (Image Cycling)
+                    if (scene.id === 'scene-gallery') {
+                        const galleryTime = elapsed - scene.start;
+                        
+                        // PHASE 1: First 1 second = Text Only (Hide Images)
+                        if (galleryTime < 1000) {
+                            const images = el.querySelectorAll('.gallery-img');
+                            images.forEach(img => img.classList.remove('visible'));
+                        } 
+                        // PHASE 2: After 1 second = Cycle Images
+                        else {
+                            // Adjust time base so image 1 starts at 1s
+                            const imageTime = galleryTime - 1000;
+                            // 20 images over remaining 7s = 350ms per image
+                            const imageIndex = Math.floor(imageTime / 350);
+                            const images = el.querySelectorAll('.gallery-img');
+                            
+                            // Show current image, hide others
+                            images.forEach((img, idx) => {
+                                if (idx === imageIndex) {
+                                    img.classList.add('visible');
+                                } else {
+                                    img.classList.remove('visible');
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+        playBtn.addEventListener('click', startSequence);
+    </script>
+</body>
+</html>
