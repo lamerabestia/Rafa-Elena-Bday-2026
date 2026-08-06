@@ -52,6 +52,16 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
+        /* Tokyo Tower Skyline Backdrop (inline SVG) - sits behind scenes and fireworks */
+        #skyline-backdrop {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: -30;
+        }
+
         /* Animation Classes */
         .scene {
             position: absolute;
@@ -228,7 +238,121 @@
 <body>
 
     <div id="flyer-container">
-        
+
+        <!-- Tokyo Tower Skyline Backdrop -->
+        <svg id="skyline-backdrop" viewBox="0 0 900 1600" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tokyo skyline with Tokyo Tower at night">
+            <defs>
+                <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0a0a1a"/>
+                    <stop offset="55%" stop-color="#111024"/>
+                    <stop offset="100%" stop-color="#1a1230"/>
+                </linearGradient>
+                <linearGradient id="tower-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fffebb"/>
+                    <stop offset="45%" stop-color="#d4af37"/>
+                    <stop offset="100%" stop-color="#a67c00"/>
+                </linearGradient>
+                <radialGradient id="moon-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#fffebb" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="#fffebb" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+
+            <!-- Sky -->
+            <rect x="0" y="0" width="900" height="1600" fill="url(#sky-grad)"/>
+
+            <!-- Stars -->
+            <g fill="#fffebb" opacity="0.6">
+                <circle cx="60" cy="120" r="1.6"/><circle cx="140" cy="60" r="1.2"/>
+                <circle cx="230" cy="150" r="1.8"/><circle cx="310" cy="70" r="1.2"/>
+                <circle cx="410" cy="110" r="1.5"/><circle cx="520" cy="55" r="1.3"/>
+                <circle cx="610" cy="130" r="1.7"/><circle cx="700" cy="80" r="1.2"/>
+                <circle cx="790" cy="140" r="1.6"/><circle cx="850" cy="60" r="1.3"/>
+                <circle cx="30" cy="220" r="1.2"/><circle cx="180" cy="230" r="1.4"/>
+                <circle cx="480" cy="190" r="1.2"/><circle cx="760" cy="220" r="1.5"/>
+            </g>
+
+            <!-- Moon -->
+            <circle cx="720" cy="180" r="90" fill="url(#moon-glow)"/>
+            <circle cx="720" cy="180" r="42" fill="#fffebb" opacity="0.85"/>
+
+            <!-- Distant skyscraper silhouettes (back layer) -->
+            <g fill="#0d0d20" opacity="0.9">
+                <rect x="0" y="820" width="70" height="480"/>
+                <rect x="80" y="760" width="55" height="540"/>
+                <rect x="145" y="850" width="60" height="450"/>
+                <rect x="720" y="800" width="65" height="500"/>
+                <rect x="795" y="740" width="55" height="560"/>
+                <rect x="850" y="860" width="50" height="440"/>
+            </g>
+
+            <!-- Mid skyscrapers -->
+            <g fill="#141428">
+                <rect x="20" y="950" width="90" height="350"/>
+                <rect x="120" y="880" width="70" height="420"/>
+                <rect x="200" y="1000" width="80" height="300"/>
+                <rect x="600" y="920" width="75" height="380"/>
+                <rect x="685" y="980" width="90" height="320"/>
+                <rect x="785" y="900" width="70" height="400"/>
+                <!-- lit windows -->
+                <g fill="#fffebb" opacity="0.5">
+                    <rect x="35" y="980" width="6" height="8"/><rect x="55" y="1010" width="6" height="8"/>
+                    <rect x="80" y="1040" width="6" height="8"/><rect x="140" y="920" width="6" height="8"/>
+                    <rect x="160" y="960" width="6" height="8"/><rect x="620" y="960" width="6" height="8"/>
+                    <rect x="650" y="1000" width="6" height="8"/><rect x="700" y="1020" width="6" height="8"/>
+                    <rect x="730" y="1050" width="6" height="8"/><rect x="800" y="940" width="6" height="8"/>
+                    <rect x="820" y="980" width="6" height="8"/>
+                </g>
+            </g>
+
+            <!-- Foreground buildings framing the tower -->
+            <g fill="#0a0a18">
+                <rect x="0" y="1150" width="300" height="450"/>
+                <rect x="620" y="1180" width="280" height="420"/>
+                <rect x="300" y="1250" width="120" height="350"/>
+                <rect x="500" y="1230" width="110" height="370"/>
+            </g>
+            <!-- Foreground lit windows -->
+            <g fill="#fffebb" opacity="0.55">
+                <rect x="30" y="1200" width="9" height="12"/><rect x="60" y="1240" width="9" height="12"/>
+                <rect x="95" y="1280" width="9" height="12"/><rect x="140" y="1210" width="9" height="12"/>
+                <rect x="200" y="1260" width="9" height="12"/><rect x="250" y="1300" width="9" height="12"/>
+                <rect x="650" y="1230" width="9" height="12"/><rect x="700" y="1270" width="9" height="12"/>
+                <rect x="750" y="1310" width="9" height="12"/><rect x="820" y="1220" width="9" height="12"/>
+                <rect x="870" y="1260" width="9" height="12"/><rect x="320" y="1300" width="8" height="11"/>
+                <rect x="360" y="1340" width="8" height="11"/><rect x="520" y="1280" width="8" height="11"/>
+                <rect x="560" y="1320" width="8" height="11"/>
+            </g>
+
+            <!-- TOKYO TOWER -->
+            <g>
+                <!-- legs -->
+                <polygon points="450,300 405,1250 460,1250 452,340" fill="url(#tower-grad)"/>
+                <polygon points="450,300 495,1250 440,1250 448,340" fill="url(#tower-grad)"/>
+                <!-- lattice cross braces -->
+                <g stroke="#a67c00" stroke-width="3" opacity="0.7">
+                    <line x1="418" y1="450" x2="482" y2="450"/>
+                    <line x1="412" y1="600" x2="488" y2="600"/>
+                    <line x1="406" y1="780" x2="494" y2="780"/>
+                    <line x1="400" y1="980" x2="500" y2="980"/>
+                    <line x1="418" y1="450" x2="482" y2="1150"/>
+                    <line x1="482" y1="450" x2="418" y2="1150"/>
+                </g>
+                <!-- mid deck -->
+                <rect x="395" y="600" width="110" height="26" fill="#d4af37"/>
+                <!-- upper deck -->
+                <rect x="425" y="330" width="50" height="18" fill="#d4af37"/>
+                <!-- mast -->
+                <rect x="446" y="150" width="8" height="150" fill="url(#tower-grad)"/>
+                <circle cx="450" cy="150" r="7" fill="#fffebb"/>
+                <!-- base -->
+                <rect x="380" y="1250" width="140" height="30" fill="#141428"/>
+            </g>
+
+            <!-- Foreground silhouette strip (very front, darkest) -->
+            <rect x="0" y="1470" width="900" height="130" fill="#050508"/>
+        </svg>
+
         <!-- Audio Element (For File Uploads) -->
         <!-- 🎵 PASTE YOUR MUSIC LINK BELOW inside src="" -->
         <audio id="bg-audio" loop src=""></audio>
@@ -326,7 +450,7 @@
 
         <!-- SCENE 1 (5-12s): Title (Shifted +5s) -->
         <div id="scene-1" class="scene">
-            <img src="https://i.postimg.cc/8c620SyK/1-Golden-Carnival-REG-Feb-Compressed.jpg" class="scene-bg" alt="Title Background">
+            <img src="https://i.postimg.cc/ZYyCnjvP/Rafa-Elena.jpg" class="scene-bg" alt="Title Background">
             <div class="scene-overlay"></div>
             
             <p id="text-presents" class="font-body text-[#fffebb] text-[10px] md:text-xs uppercase tracking-[0.25em] mb-6 fade-up opacity-90" style="transition-delay: 0.2s;">
@@ -334,7 +458,7 @@
             </p>
 
             <h1 id="text-title" class="font-title text-5xl md:text-6xl text-gold-gradient text-center leading-tight tracking-normal fade-up" style="transition-delay: 0.6s;">
-                RAFAEL & ELENA <br>BIRTHDAY
+                RAFAEL & ELENA<br>BIRTHDAY
             </h1>
             
             <div class="divider-gold fade-up" style="transition-delay: 1.0s;"></div>
@@ -352,7 +476,7 @@
             <div class="fade-up text-center" style="transition-delay: 0.1s;">
                 <p id="text-save-date" class="font-body text-[#d4af37] text-xs uppercase tracking-widest mb-4">Save the Date</p>
                 <h2 id="text-day" class="font-title text-4xl text-white mb-2">Saturday</h2>
-                <h2 id="text-date" class="font-title text-5xl text-gold-gradient mb-1">August 22nd</h2>
+                <h2 id="text-date" class="font-title text-5xl text-gold-gradient mb-1">Aug 22nd</h2>
                 <p id="text-year" class="font-title text-white text-xl mt-2">2026</p>
             </div>
             <div class="my-4 fade-up text-center" style="transition-delay: 0.2s;">
@@ -362,7 +486,7 @@
 
         <!-- SCENE 3 (18-25s): Time & Venue (Shifted +5s) -->
         <div id="scene-3" class="scene">
-            <img src="https://i.postimg.cc/3wyWxyWm/3_Venue_REG_Feb_compressed.png" class="scene-bg" alt="Hotel Background">
+            <img src="https://i.postimg.cc/yY85M2FD/Venue.png" class="scene-bg" alt="Hotel Background">
             <div class="scene-overlay"></div>
 
             <div class="fade-up text-center px-6 mt-8" style="transition-delay: 0.6s;">
@@ -395,16 +519,16 @@
 
         <!-- SCENE 6 (36-44s): Dress Code (Shifted +5s) -->
         <div id="scene-6" class="scene">
-            <img src="https://i.postimg.cc/MZV4J82V/Dress-Code-REG-Feb-No-text.png" class="scene-bg" alt="Dress Code Background">
+            <img src="https://i.postimg.cc/NMKL1kJF/BAckground.png" class="scene-bg" alt="Dress Code Background">
             <div class="scene-overlay"></div>
 
             <div class="w-full text-center fade-up" style="transition-delay: 0.2s;">
                 <p id="text-dc-label" class="font-title text-[#d4af37] text-2xl mb-4 border-b border-white/20 inline-block pb-2">Dress Code</p>
-                <p id="text-dc-main" class="font-title text-white text-3xl mb-4">ELEGANT</p>
+                <p id="text-dc-main" class="font-title text-white text-3xl mb-4">SEMI-FORMAL</p>
                 <div class="bg-black/40 p-4 rounded backdrop-blur-sm mx-4">
-                    <p id="text-dc-gents" class="font-body text-gray-200 text-sm">Gents: Suit</p>
-                    <p id="text-dc-ladies" class="font-body text-gray-200 text-sm">Ladies: Red /  Black / White / Gold</p>
-                    <p id="text-dc-note" class="font-body text-[#fffebb] text-1x1 italic mt-2">Golden accessories encouraged ✨</p>
+                    <p id="text-dc-gents" class="font-body text-gray-200 text-sm">Linen shirts, tailored shorts or trousers</p>
+                    <p id="text-dc-ladies" class="font-body text-gray-200 text-sm">Light dresses encouraged</p>
+                    <p id="text-dc-note" class="font-body text-[#fffebb] text-1x1 italic mt-2">One vibrant summer tone: Coral, Yellow, Turquoise, White, or Lavender ✨</p>
                 </div>
             </div>
         </div>
@@ -519,20 +643,28 @@
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
         /**
-         * FALLING GOLD DUST ENGINE
+         * FIREWORKS ENGINE (realistic multi-colored)
          */
         const canvas = document.getElementById('dust-canvas');
         const ctx = canvas.getContext('2d');
-        
-        const colors = [
-            'rgba(255, 254, 187, 0.9)', 
-            'rgba(212, 175, 55, 0.8)',  
-            'rgba(197, 160, 0, 0.6)',   
-            'rgba(166, 124, 0, 0.4)'    
+
+        // Palette pool — each firework explosion picks one (or two, for bi-color bursts)
+        const fireworkPalettes = [
+            ['#fffebb', '#d4af37', '#a67c00'],   // gold
+            ['#ff5e5e', '#ff2e63', '#c81d5e'],   // red/pink
+            ['#5ec8ff', '#2e8fff', '#1d5ec8'],   // blue
+            ['#7dff8f', '#2ecc71', '#1a9c4a'],   // green
+            ['#d17dff', '#a83ce0', '#7a1ec9'],   // purple
+            ['#ffffff', '#e0e0e0', '#bfbfbf']    // white/silver
         ];
 
-        let particles = [];
+        let rockets = [];
+        let sparks = [];
+        let crackles = [];
+        let flashes = [];
         let width, height;
+        let lastLaunch = 0;
+        let nextLaunchDelay = 650;
 
         function resize() {
             width = canvas.parentElement.offsetWidth;
@@ -541,56 +673,250 @@
             canvas.height = height;
         }
 
-        class Particle {
-            constructor() {
-                this.reset(true);
-            }
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
 
-            reset(initial = false) {
-                this.x = Math.random() * width;
-                if (initial) {
-                    this.y = Math.random() * height;
-                } else {
-                    this.y = -10; 
-                }
-                this.size = Math.random() < 0.9 ? Math.random() * 2 + 0.5 : Math.random() * 4 + 2; 
-                this.speed = Math.random() * 1.5 + 0.2; 
-                this.drift = (Math.random() - 0.5) * 0.3;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.opacity = Math.random() * 0.5 + 0.5;
+        // Bright radial pop at the moment of explosion
+        class Flash {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.life = 1;
+                this.decay = 0.1;
+                this.size = 28 + Math.random() * 22;
+            }
+            update() { this.life -= this.decay; }
+            draw() {
+                if (this.life <= 0) return;
+                ctx.globalCompositeOperation = 'lighter';
+                const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                grad.addColorStop(0, `rgba(255,255,255,${0.55 * this.life})`);
+                grad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+            }
+        }
+
+        // Tiny secondary glitter sparks ("crackle" effect) spun off from some sparks
+        class Crackle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 1.6 + 0.3;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.gravity = 0.03;
+                this.size = Math.random() * 1 + 0.5;
+                this.color = Math.random() < 0.5 ? '#ffffff' : color;
+                this.life = 1;
+                this.decay = Math.random() * 0.05 + 0.045;
+            }
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+            }
+            draw() {
+                if (this.life <= 0) return;
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = hexToRgba(this.color, Math.max(this.life, 0));
+                ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+            }
+        }
+
+        // A rocket travels up from the bottom, then explodes into Sparks
+        class Rocket {
+            constructor() {
+                this.x = width * (0.12 + Math.random() * 0.76);
+                this.y = height + 10;
+                this.targetY = height * (0.12 + Math.random() * 0.38);
+                this.speed = 6 + Math.random() * 3;
+                this.sway = (Math.random() - 0.5) * 0.6;
+                // Occasionally a bi-color burst (two palettes mixed together)
+                this.palettes = Math.random() < 0.3
+                    ? [fireworkPalettes[Math.floor(Math.random() * fireworkPalettes.length)],
+                       fireworkPalettes[Math.floor(Math.random() * fireworkPalettes.length)]]
+                    : [fireworkPalettes[Math.floor(Math.random() * fireworkPalettes.length)]];
+                this.burstType = ['peony', 'peony', 'willow', 'ring'][Math.floor(Math.random() * 4)];
+                this.trail = [];
+                this.done = false;
             }
 
             update() {
-                this.y += this.speed;
-                this.x += this.drift;
-                this.x += Math.sin(this.y * 0.02) * 0.2;
-                if (this.y > height + 10) this.reset();
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > 6) this.trail.shift();
+
+                this.speed *= 0.985; // gradual thrust loss, like a real shell
+                this.y -= this.speed;
+                this.x += Math.sin(this.y * 0.04) * this.sway;
+
+                if (this.y <= this.targetY || this.speed < 1.2) {
+                    this.explode();
+                    this.done = true;
+                }
+            }
+
+            explode() {
+                flashes.push(new Flash(this.x, this.y));
+
+                if (this.burstType === 'ring') {
+                    const ringCount = 42;
+                    for (let i = 0; i < ringCount; i++) {
+                        const angle = (Math.PI * 2 / ringCount) * i;
+                        sparks.push(new Spark(this.x, this.y, this.palettes[0][i % this.palettes[0].length], 'ring', angle));
+                    }
+                } else {
+                    const count = this.burstType === 'willow' ? 70 + Math.floor(Math.random() * 30) : 55 + Math.floor(Math.random() * 35);
+                    for (let i = 0; i < count; i++) {
+                        const palette = this.palettes[i % this.palettes.length];
+                        const color = palette[Math.floor(Math.random() * palette.length)];
+                        sparks.push(new Spark(this.x, this.y, color, this.burstType));
+                    }
+                }
             }
 
             draw() {
+                ctx.globalCompositeOperation = 'lighter';
+                if (this.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    ctx.lineTo(this.x, this.y);
+                    ctx.strokeStyle = 'rgba(255, 240, 200, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+                // Glowing rocket head
+                const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 6);
+                grad.addColorStop(0, 'rgba(255,255,255,0.95)');
+                grad.addColorStop(1, 'rgba(255,220,150,0)');
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+            }
+        }
+
+        // A single spark from a firework explosion
+        class Spark {
+            constructor(x, y, color, type = 'peony', angle = null) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                const a = angle !== null ? angle : Math.random() * Math.PI * 2;
+
+                let speed;
+                if (type === 'willow') speed = Math.random() * 2.5 + 2.5;
+                else if (type === 'ring') speed = 4.2 + Math.random() * 0.6;
+                else speed = Math.random() * 5 + 2;
+
+                this.vx = Math.cos(a) * speed;
+                this.vy = Math.sin(a) * speed;
+
+                if (type === 'willow') { this.gravity = 0.09; this.drag = 0.986; }
+                else if (type === 'ring') { this.gravity = 0.05; this.drag = 0.975; }
+                else { this.gravity = 0.045 + Math.random() * 0.02; this.drag = 0.965 + Math.random() * 0.02; }
+
+                this.size = type === 'willow' ? Math.random() * 1.3 + 0.8 : Math.random() * 2.2 + 1;
+                this.color = color;
+                this.life = 1;
+                this.decay = type === 'willow' ? Math.random() * 0.006 + 0.005 : Math.random() * 0.018 + 0.014;
+                this.trail = [];
+                this.trailLen = type === 'willow' ? 7 : 3;
+                this.crackle = type === 'peony' && Math.random() < 0.12;
+                this.hasCrackled = false;
+            }
+
+            update() {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > this.trailLen) this.trail.shift();
+
+                this.vx *= this.drag;
+                this.vy *= this.drag;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+
+                // A handful of sparks "crackle" into a tiny glitter burst near the end of life
+                if (this.crackle && !this.hasCrackled && this.life < 0.35 && Math.random() < 0.3) {
+                    this.hasCrackled = true;
+                    for (let i = 0; i < 5; i++) crackles.push(new Crackle(this.x, this.y, this.color));
+                }
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                ctx.globalCompositeOperation = 'lighter';
+                if (this.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    ctx.lineTo(this.x, this.y);
+                    ctx.strokeStyle = hexToRgba(this.color, Math.max(this.life, 0) * 0.6);
+                    ctx.lineWidth = this.size;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = hexToRgba(this.color, Math.max(this.life, 0));
                 ctx.fill();
-                ctx.globalAlpha = 1;
+                ctx.globalCompositeOperation = 'source-over';
             }
         }
 
         function initParticles() {
             resize();
-            particles = [];
-            for(let i = 0; i < 250; i++) {
-                particles.push(new Particle());
-            }
+            rockets = [];
+            sparks = [];
+            crackles = [];
+            flashes = [];
+            lastLaunch = 0;
         }
 
-        function animateDust() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+        function animateDust(timestamp) {
+            // Fading trail effect instead of a hard clear (lets streaks linger briefly)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillRect(0, 0, width, height);
+            ctx.globalCompositeOperation = 'source-over';
+
+            // Launch new rockets periodically (occasionally two at once for a fuller show)
+            if (!lastLaunch) lastLaunch = timestamp;
+            if (timestamp - lastLaunch > nextLaunchDelay) {
+                rockets.push(new Rocket());
+                if (Math.random() < 0.2) rockets.push(new Rocket());
+                lastLaunch = timestamp;
+                nextLaunchDelay = 450 + Math.random() * 750;
+            }
+
+            rockets.forEach(r => { r.update(); r.draw(); });
+            rockets = rockets.filter(r => !r.done);
+
+            sparks.forEach(s => { s.update(); s.draw(); });
+            sparks = sparks.filter(s => s.life > 0);
+
+            crackles.forEach(c => { c.update(); c.draw(); });
+            crackles = crackles.filter(c => c.life > 0);
+
+            flashes.forEach(f => { f.update(); f.draw(); });
+            flashes = flashes.filter(f => f.life > 0);
+
             requestAnimationFrame(animateDust);
         }
 
@@ -600,20 +926,20 @@
         });
 
         initParticles();
-        animateDust();
+        requestAnimationFrame(animateDust);
 
 
         /**
-         * TIMELINE LOGIC (60.5 SECONDS)
+         * TIMELINE LOGIC (63.5 SECONDS)
          * Scene 0: 5s (0-5000) - NEW Personal Invite
          * Scene 1: 7s (5000-12000)
          * Scene 2: 6s (12000-18000)
          * Scene 3: 7s (18000-25000)
          * Scene 4: 8s (25000-33000)
          * Scene 5: 3s (33000-36000)
-         * Scene 6: 8s (36000-44000)
-         * Scene 7 (Gallery): 8s (44000-52000)
-         * Scene 8: 8.5s (52000-60500)
+         * Scene 6: 11s (36000-47000)
+         * Scene 7 (Gallery): 8s (47000-55000)
+         * Scene 8: 8.5s (55000-63500)
          */
         const scenes = [
             { id: 'scene-0', start: 0, end: 5000 },
@@ -622,9 +948,9 @@
             { id: 'scene-3', start: 18000, end: 25000 },
             { id: 'scene-4', start: 25000, end: 33000 },
             { id: 'scene-5', start: 33000, end: 36000 },
-            { id: 'scene-6', start: 36000, end: 44000 },
-            { id: 'scene-gallery', start: 44000, end: 52000 },
-            { id: 'scene-8', start: 52000, end: 60500 }
+            { id: 'scene-6', start: 36000, end: 47000 },
+            { id: 'scene-gallery', start: 47000, end: 55000 },
+            { id: 'scene-8', start: 55000, end: 63500 }
         ];
 
         let startTime = null;
@@ -653,7 +979,7 @@
         const displayTo = document.getElementById('display-to');
         const displayFrom = document.getElementById('display-from');
         
-        const totalDuration = 60500;
+        const totalDuration = 63500;
         
         // LANGUAGE SETTINGS
         const translations = {
@@ -661,11 +987,11 @@
                 invite_for: "An Exclusive Invitation For",
                 from: "From",
                 presents: "R.E.G. Presents",
-                title: "GOLDEN<br>CARNIVAL",
+                title: "RAFAEL & ELENA<br>BIRTHDAY",
                 rsvp_only: "STRICTLY RSVP ONLY",
                 save_date: "Save the Date",
                 day: "Saturday",
-                date: "Feb 28th",
+                date: "Aug 22nd",
                 year: "2026",
                 venue_label: "Venue",
                 venue: "Luxury Suite Room<br>Central Tokyo Hotel",
@@ -673,10 +999,10 @@
                 exp_2: "Elevated Celebration",
                 exp_3: "and unforgettable energy.",
                 dc_label: "Dress Code",
-                dc_main: "ELEGANT",
-                dc_gents: "Gents: Suit",
-                dc_ladies: "Ladies: Red / Black / White / Gold",
-                dc_note: "Golden accessories encouraged ✨",
+                dc_main: "SEMI-FORMAL",
+                dc_gents: "Linen shirts, tailored shorts or trousers",
+                dc_ladies: "Light dresses encouraged",
+                dc_note: "One vibrant summer tone: Coral, Yellow, Turquoise, White, or Lavender ✨",
                 past_events: "PAST EVENTS",
                 memories: "Unforgettable Moments",
                 fee_label: "Event fee",
@@ -696,11 +1022,11 @@
                 invite_for: "特別なご招待",
                 from: "送り主",
                 presents: "R.E.G. Presents",
-                title: "ゴールデン<br>カーニバル",
+                title: "RAFAEL & ELENA<br>バースデー",
                 rsvp_only: "完全招待制",
                 save_date: "開催日",
                 day: "土曜日",
-                date: "2月28日",
+                date: "8月22日",
                 year: "2026年",
                 venue_label: "会場",
                 venue: "都心ホテル<br>ラグジュアリー<br>スイート",
@@ -708,10 +1034,10 @@
                 exp_2: "極上の<br>セレブレーション",
                 exp_3: "忘れられない熱狂を。",
                 dc_label: "ドレスコード",
-                dc_main: "エレガント",
-                dc_gents: "男性：スーツ",
-                dc_ladies: "女性：赤 / 黒 / 白  <br>ゴールデン",
-                dc_note: "ゴールデンアクセサリー<br>推奨 ✨",
+                dc_main: "セミフォーマル",
+                dc_gents: "リネンシャツ、テーラード<br>ショーツまたはトラウザーズ",
+                dc_ladies: "軽やかなドレスを<br>おすすめします",
+                dc_note: "夏らしい鮮やかな一色で：<br>コーラル / イエロー / ターコイズ / 白 / ラベンダー ✨",
                 past_events: "過去の<br>イベント",
                 memories: "思い出の瞬間",
                 fee_label: "参加費",
